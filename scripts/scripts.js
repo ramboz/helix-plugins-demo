@@ -15,6 +15,48 @@ import {
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
 
+/* Templates */
+
+// A template that will resolve by default
+window.hlx.templates.add('foo', '/templates/foo.js');
+
+// A template that will not resolve
+window.hlx.templates.add('bar', '/templates/bar.js');
+
+// Shorthand, also won't resolve
+window.hlx.templates.add('/templates/garply.js');
+
+/* Plugins */
+
+// An inline plugin
+window.hlx.plugins.add('inline-plugin-baz', {
+  condition: () => true,
+  loadEager: () => {
+    console.log('plugin baz: eager');
+  },
+  loadLazy: () => {
+    console.log('plugin baz: lazy');
+  },
+  loadDelayed: () => {
+    console.log('plugin baz: delayed');
+  },
+});
+
+// An external plugin that loads in the lazy phase
+window.hlx.plugins.add('external-plugin-qux', {
+  url: '/plugins/qux.js',
+  load: 'lazy',
+});
+
+// An external plugin that will never load
+window.hlx.plugins.add('external-plugin-corge', {
+  condition: () => false,
+  url: '/plugins/corge.js',
+});
+
+// Shorthand
+window.hlx.plugins.add('/plugins/grault.js');
+
 /**
  * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
@@ -75,8 +117,9 @@ export function decorateMain(main) {
  */
 async function loadEager(doc) {
   document.documentElement.lang = 'en';
-  decorateTemplateAndTheme();
+  await decorateTemplateAndTheme();
   const main = doc.querySelector('main');
+  await window.hlx.plugins.run('loadEager');
   if (main) {
     decorateMain(main);
     document.body.classList.add('appear');
@@ -114,6 +157,7 @@ async function loadLazy(doc) {
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
   sampleRUM.observe(main.querySelectorAll('picture > img'));
+  window.hlx.plugins.run('loadLazy');
 }
 
 /**
@@ -122,12 +166,18 @@ async function loadLazy(doc) {
  */
 function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
-  window.setTimeout(() => import('./delayed.js'), 3000);
+  window.setTimeout(() => {
+    window.hlx.plugins.load('delayed');
+    import('./delayed.js');
+    window.hlx.plugins.run('loadDelayed');
+  }, 3000);
   // load anything that can be postponed to the latest here
 }
 
 async function loadPage() {
+  await window.hlx.plugins.load('eager');
   await loadEager(document);
+  await window.hlx.plugins.load('lazy');
   await loadLazy(document);
   loadDelayed();
 }
