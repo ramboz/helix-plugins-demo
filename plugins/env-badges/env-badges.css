@@ -15,6 +15,6 @@
 }
 
 .is-stage::before {
-  --badge-color: #00c;
+  --badge-color: #aaf;
   --badge-label: 'Stage';
 }
