@@ -1,0 +1,20 @@
+.is-dev::before,
+.is-stage::before {
+  position: fixed;
+  inset: 1rem auto auto 1rem;
+  background: var(--badge-color);
+  border-radius: .25rem;
+  padding: 0 .5rem;
+  content: var(--badge-label);
+  z-index: 999;
+}
+
+.is-dev::before {
+  --badge-color: #0c0;
+  --badge-label: 'Dev';
+}
+
+.is-stage::before {
+  --badge-color: #00c;
+  --badge-label: 'Stage';
+}

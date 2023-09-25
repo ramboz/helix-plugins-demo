@@ -17,45 +17,36 @@ const LCP_BLOCKS = []; // add your LCP blocks to the list
 
 /* Templates */
 
-// A template that will resolve by default
-window.hlx.templates.add('foo', '/templates/foo.js');
+// Explicit template addition
+window.hlx.templates.add('1 Column', '/templates/1-column.js');
 
-// A template that will not resolve
-window.hlx.templates.add('bar', '/templates/bar.js');
+// Implicit template addition
+window.hlx.templates.add('/templates/2-columns.js');
 
-// Shorthand, also won't resolve
-window.hlx.templates.add('/templates/garply.js');
+// Implicit template with both JS and CSS
+window.hlx.templates.add('/templates/3-columns');
 
 /* Plugins */
 
-// An inline plugin
-window.hlx.plugins.add('inline-plugin-baz', {
-  condition: () => true,
-  loadEager: () => {
-    console.log('plugin baz: eager');
-  },
-  loadLazy: () => {
-    console.log('plugin baz: lazy');
-  },
-  loadDelayed: () => {
-    console.log('plugin baz: delayed');
-  },
-});
+// An generic external plugin
+window.hlx.plugins.add('cwv', '/plugins/web-vitals/index.js');
 
-// An external plugin that loads in the lazy phase
-window.hlx.plugins.add('external-plugin-qux', {
-  url: '/plugins/qux.js',
+// An inline plugin that loads in the lazy phase with a condition and has both JS and CSS
+window.hlx.plugins.add('env-badges', {
+  condition: () => window.location.hostname === 'localhost' || window.location.hostname.endsWith('.hlx.page'),
   load: 'lazy',
+  url: '/plugins/env-badges',
 });
 
-// An external plugin that will never load
-window.hlx.plugins.add('external-plugin-corge', {
-  condition: () => false,
-  url: '/plugins/corge.js',
+// An inline plugin
+window.hlx.plugins.add('timings', {
+  loadEager: () => console.log('[plugin][timings] eager:', `${Math.round(performance.now())}ms`),
+  loadLazy: () => console.log('[plugin][timings] lazy:', `${Math.round(performance.now())}ms`),
+  loadDelayed: () => console.log('[plugin][timings] delayed:', `${Math.round(performance.now())}ms`),
 });
 
 // Shorthand
-window.hlx.plugins.add('/plugins/grault.js');
+window.hlx.plugins.add('/plugins/debug.js');
 
 /**
  * Builds hero block and prepends to main in a new section.
