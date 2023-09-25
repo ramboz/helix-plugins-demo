@@ -18,3 +18,8 @@
   --badge-color: #aaf;
   --badge-label: 'Stage';
 }
+
+.is-live::before {
+  --badge-color: #f00;
+  --badge-label: 'Stage';
+}
